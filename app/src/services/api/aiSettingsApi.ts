@@ -22,7 +22,6 @@ import {
   authRemoveProviderCredentials,
   authStoreProviderCredentials,
 } from '../../utils/tauriCommands/auth';
-import { isTauri } from '../../utils/tauriCommands/common';
 import {
   type ClientConfig,
   type CloudProviderCreds,
@@ -462,7 +461,8 @@ export async function importOpenAiCodexCliAuth(): Promise<void> {
  * (they're written via `setCloudProviderKey` on their own path).
  */
 export async function flushCloudProviders(providers: CloudProviderCreds[]): Promise<void> {
-  if (!isTauri()) return;
+  // `openhumanUpdateModelSettings` talks to the core over HTTP, so the eager
+  // flush works in both desktop (Tauri) and webapp builds.
   await openhumanUpdateModelSettings({ cloud_providers: providers });
 }
 
@@ -475,9 +475,6 @@ export async function flushCloudProviders(providers: CloudProviderCreds[]): Prom
  * running in Tauri (browser dev mode has no RPC bridge).
  */
 export async function listProviderModels(providerId: string): Promise<ModelInfo[]> {
-  if (!isTauri()) {
-    return [];
-  }
   const res = await callCoreRpc<{ result: { models: ModelInfo[] } }>({
     method: 'openhuman.inference_list_models',
     params: { provider_id: providerId },
@@ -490,9 +487,6 @@ export async function testProviderModel(
   provider: string,
   prompt = 'Hello world'
 ): Promise<ProviderModelTestResult> {
-  if (!isTauri()) {
-    throw new Error('Model testing is only available in the desktop app.');
-  }
   const res = await callCoreRpc<{ result: ProviderModelTestResult }>({
     method: 'openhuman.inference_test_provider_model',
     params: { workload, provider, prompt },

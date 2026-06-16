@@ -879,13 +879,19 @@ describe('listProviderModels', () => {
     expect(models[1].id).toBe('gpt-4o-mini');
   });
 
-  it('returns empty array when not running in Tauri', async () => {
+  it('still dispatches over HTTP when not running in Tauri (webapp build)', async () => {
     mockIsTauri.mockReturnValue(false);
+    mockCallCoreRpc.mockResolvedValue({
+      result: { models: [{ id: 'gpt-4o', owned_by: 'openai', context_window: 128000 }] },
+    });
 
     const models = await listProviderModels('openai');
 
-    expect(models).toEqual([]);
-    expect(mockCallCoreRpc).not.toHaveBeenCalled();
+    expect(mockCallCoreRpc).toHaveBeenCalledWith({
+      method: 'openhuman.inference_list_models',
+      params: { provider_id: 'openai' },
+    });
+    expect(models).toHaveLength(1);
   });
 
   it('throws on RPC error so callers can surface retry UI', async () => {
@@ -922,13 +928,18 @@ describe('testProviderModel', () => {
     expect(result).toEqual({ reply: 'Hello from model' });
   });
 
-  it('throws when not running in Tauri', async () => {
+  it('still dispatches over HTTP when not running in Tauri (webapp build)', async () => {
     mockIsTauri.mockReturnValue(false);
+    mockCallCoreRpc.mockResolvedValue({ result: { reply: 'Hello from model' } });
 
-    await expect(testProviderModel('reasoning', 'openai:gpt-4o')).rejects.toThrow(
-      'Model testing is only available in the desktop app.'
-    );
-    expect(mockCallCoreRpc).not.toHaveBeenCalled();
+    const result = await testProviderModel('reasoning', 'openai:gpt-4o');
+
+    expect(mockCallCoreRpc).toHaveBeenCalledWith({
+      method: 'openhuman.inference_test_provider_model',
+      params: { workload: 'reasoning', provider: 'openai:gpt-4o', prompt: 'Hello world' },
+      timeoutMs: 120000,
+    });
+    expect(result).toEqual({ reply: 'Hello from model' });
   });
 });
 
@@ -955,10 +966,11 @@ describe('flushCloudProviders', () => {
     expect(mockOpenhumanUpdateModelSettings).toHaveBeenCalledWith({ cloud_providers: providers });
   });
 
-  it('no-ops when not running in Tauri', async () => {
+  it('still flushes over HTTP when not running in Tauri (webapp build)', async () => {
     mockIsTauri.mockReturnValue(false);
+    mockOpenhumanUpdateModelSettings.mockResolvedValue({});
     await flushCloudProviders([]);
-    expect(mockOpenhumanUpdateModelSettings).not.toHaveBeenCalled();
+    expect(mockOpenhumanUpdateModelSettings).toHaveBeenCalledWith({ cloud_providers: [] });
   });
 });
 

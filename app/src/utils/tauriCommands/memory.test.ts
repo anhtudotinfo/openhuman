@@ -26,10 +26,18 @@ beforeEach(() => {
 });
 
 describe('memorySyncChannel', () => {
-  test('throws when not in Tauri', async () => {
+  test('dispatches via callCoreRpc even when not in Tauri', async () => {
     mockIsTauri.mockReturnValue(false);
-    await expect(memorySyncChannel('ch-1')).rejects.toThrow('Not running in Tauri');
-    expect(mockCallCoreRpc).not.toHaveBeenCalled();
+    const mockResp = { requested: true, channel_id: 'ch-1' };
+    mockCallCoreRpc.mockResolvedValueOnce(mockResp);
+
+    const result = await memorySyncChannel('ch-1');
+
+    expect(mockCallCoreRpc).toHaveBeenCalledWith({
+      method: 'openhuman.memory_sync_channel',
+      params: { channel_id: 'ch-1' },
+    });
+    expect(result).toEqual(mockResp);
   });
 
   test('calls memory_sync_channel with correct channel_id', async () => {
@@ -47,9 +55,14 @@ describe('memorySyncChannel', () => {
 });
 
 describe('memorySyncAll', () => {
-  test('throws when not in Tauri', async () => {
+  test('dispatches via callCoreRpc even when not in Tauri', async () => {
     mockIsTauri.mockReturnValue(false);
-    await expect(memorySyncAll()).rejects.toThrow('Not running in Tauri');
+    mockCallCoreRpc.mockResolvedValueOnce({ requested: true });
+
+    const result = await memorySyncAll();
+
+    expect(mockCallCoreRpc).toHaveBeenCalledWith({ method: 'openhuman.memory_sync_all' });
+    expect(result).toEqual({ requested: true });
   });
 
   test('calls memory_sync_all and returns result', async () => {
@@ -63,9 +76,18 @@ describe('memorySyncAll', () => {
 });
 
 describe('memoryLearnAll', () => {
-  test('throws when not in Tauri', async () => {
+  test('dispatches via callCoreRpc even when not in Tauri', async () => {
     mockIsTauri.mockReturnValue(false);
-    await expect(memoryLearnAll()).rejects.toThrow('Not running in Tauri');
+    const mockResp = { namespaces_processed: 0, results: [] };
+    mockCallCoreRpc.mockResolvedValueOnce(mockResp);
+
+    const result = await memoryLearnAll();
+
+    expect(mockCallCoreRpc).toHaveBeenCalledWith({
+      method: 'openhuman.memory_learn_all',
+      params: {},
+    });
+    expect(result.namespaces_processed).toBe(0);
   });
 
   test('calls memory_learn_all without namespaces param when none provided', async () => {
@@ -152,17 +174,32 @@ describe('aiListMemoryFiles', () => {
     expect(await aiListMemoryFiles()).toEqual([]);
   });
 
-  test('throws when not running in Tauri', async () => {
+  test('dispatches via callCoreRpc even when not running in Tauri', async () => {
     mockIsTauri.mockReturnValue(false);
-    await expect(aiListMemoryFiles()).rejects.toThrow(/Not running in Tauri/);
+    mockCallCoreRpc.mockResolvedValueOnce({ data: { files: ['a.md', 'b.md'] } });
+
+    const files = await aiListMemoryFiles();
+
+    expect(mockCallCoreRpc).toHaveBeenCalledWith({
+      method: 'openhuman.memory_list_files',
+      params: { relative_dir: '' },
+    });
+    expect(files).toEqual(['a.md', 'b.md']);
   });
 });
 
 describe('whatsappListChats', () => {
-  test('throws when not in Tauri', async () => {
+  test('dispatches via callCoreRpc even when not in Tauri', async () => {
     mockIsTauri.mockReturnValue(false);
-    await expect(whatsappListChats()).rejects.toThrow('Not running in Tauri');
-    expect(mockCallCoreRpc).not.toHaveBeenCalled();
+    mockCallCoreRpc.mockResolvedValueOnce([]);
+
+    const result = await whatsappListChats({ limit: 10 });
+
+    expect(mockCallCoreRpc).toHaveBeenCalledWith({
+      method: 'openhuman.whatsapp_data_list_chats',
+      params: { limit: 10 },
+    });
+    expect(result).toEqual([]);
   });
 
   test('calls correct RPC method with provided params', async () => {
@@ -205,10 +242,17 @@ describe('whatsappListChats', () => {
 });
 
 describe('whatsappListMessages', () => {
-  test('throws when not in Tauri', async () => {
+  test('dispatches via callCoreRpc even when not in Tauri', async () => {
     mockIsTauri.mockReturnValue(false);
-    await expect(whatsappListMessages({ chat_id: 'c1' })).rejects.toThrow('Not running in Tauri');
-    expect(mockCallCoreRpc).not.toHaveBeenCalled();
+    mockCallCoreRpc.mockResolvedValueOnce([]);
+
+    const result = await whatsappListMessages({ chat_id: 'c1', limit: 50 });
+
+    expect(mockCallCoreRpc).toHaveBeenCalledWith({
+      method: 'openhuman.whatsapp_data_list_messages',
+      params: { chat_id: 'c1', limit: 50 },
+    });
+    expect(result).toEqual([]);
   });
 
   test('calls correct RPC method with required chat_id param', async () => {

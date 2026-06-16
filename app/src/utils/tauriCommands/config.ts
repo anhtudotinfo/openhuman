@@ -207,9 +207,6 @@ export interface AIPreview {
 }
 
 export async function openhumanGetConfig(): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({ method: CORE_RPC_METHODS.configGet });
 }
 
@@ -252,9 +249,8 @@ export interface ClientConfig {
 }
 
 export async function openhumanGetClientConfig(): Promise<CommandResponse<ClientConfig>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
+  // Web/browser target has no Tauri IPC, but `callCoreRpc` talks to the core
+  // directly over HTTP, so this works in both desktop and webapp builds.
   return await callCoreRpc<CommandResponse<ClientConfig>>({
     method: 'openhuman.inference_get_client_config',
   });
@@ -278,9 +274,6 @@ export type ClaudeCodeStatus =
  * `not_installed` variant signals that case explicitly.
  */
 export async function openhumanClaudeCodeStatus(): Promise<CommandResponse<ClaudeCodeStatus>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ClaudeCodeStatus>>({
     method: 'openhuman.inference_claude_code_status',
   });
@@ -313,9 +306,6 @@ export type ClaudeCodeAuthStatus =
  * Recheck, not on a tight loop.
  */
 export async function openhumanClaudeCodeAuthStatus(): Promise<ClaudeCodeAuthStatus> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   // The core handler returns the value via `RpcOutcome::new(_, vec![])` with no
   // logs, which `into_cli_compatible_json` serializes as the BARE value (not a
   // `{ result, logs }` envelope). `callCoreRpc` returns the JSON-RPC `result`,
@@ -342,9 +332,6 @@ export interface ClaudeCodeSettings {
  * `{ result, logs }` envelope) — see {@link openhumanClaudeCodeAuthStatus}.
  */
 export async function openhumanClaudeCodeSettings(): Promise<ClaudeCodeSettings> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<ClaudeCodeSettings>({
     method: 'openhuman.inference_claude_code_settings',
   });
@@ -357,9 +344,6 @@ export async function openhumanClaudeCodeSettings(): Promise<ClaudeCodeSettings>
 export async function openhumanClaudeCodeSetFullAccess(
   enabled: boolean
 ): Promise<ClaudeCodeSettings> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<ClaudeCodeSettings>({
     method: 'openhuman.inference_claude_code_set_full_access',
     params: { enabled },
@@ -384,9 +368,7 @@ export async function openhumanClaudeCodeLoginLaunch(): Promise<string> {
 export async function openhumanUpdateModelSettings(
   update: ModelSettingsUpdate
 ): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
+  // Works over HTTP via `callCoreRpc` in both desktop (Tauri) and webapp builds.
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: 'openhuman.inference_update_model_settings',
     params: update,
@@ -396,9 +378,6 @@ export async function openhumanUpdateModelSettings(
 export async function openhumanUpdateMemorySettings(
   update: MemorySettingsUpdate
 ): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: CORE_RPC_METHODS.configUpdateMemorySettings,
     params: update,
@@ -408,9 +387,6 @@ export async function openhumanUpdateMemorySettings(
 export async function openhumanUpdateRuntimeSettings(
   update: RuntimeSettingsUpdate
 ): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: CORE_RPC_METHODS.configUpdateRuntimeSettings,
     params: update,
@@ -420,9 +396,6 @@ export async function openhumanUpdateRuntimeSettings(
 export async function openhumanUpdateBrowserSettings(
   update: BrowserSettingsUpdate
 ): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: CORE_RPC_METHODS.configUpdateBrowserSettings,
     params: update,
@@ -432,9 +405,6 @@ export async function openhumanUpdateBrowserSettings(
 export async function openhumanUpdateScreenIntelligenceSettings(
   update: ScreenIntelligenceSettingsUpdate
 ): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: CORE_RPC_METHODS.configUpdateScreenIntelligenceSettings,
     params: update,
@@ -481,9 +451,6 @@ export interface AutonomySettingsUpdate {
 }
 
 export async function openhumanGetAutonomySettings(): Promise<CommandResponse<AutonomySettings>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AutonomySettings>>({
     method: CORE_RPC_METHODS.configGetAutonomySettings,
   });
@@ -512,9 +479,6 @@ export interface AgentPaths {
 }
 
 export async function openhumanGetAgentPaths(): Promise<CommandResponse<AgentPaths>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AgentPaths>>({
     method: CORE_RPC_METHODS.configGetAgentPaths,
   });
@@ -528,9 +492,6 @@ export interface AgentPathsUpdate {
 export async function openhumanUpdateAgentPaths(
   update: AgentPathsUpdate
 ): Promise<CommandResponse<AgentPaths>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AgentPaths>>({
     method: CORE_RPC_METHODS.configUpdateAgentPaths,
     params: update,
@@ -540,9 +501,6 @@ export async function openhumanUpdateAgentPaths(
 export async function openhumanUpdateAutonomySettings(
   update: AutonomySettingsUpdate
 ): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: CORE_RPC_METHODS.configUpdateAutonomySettings,
     params: update,
@@ -576,9 +534,6 @@ export interface SandboxSettingsUpdate {
 }
 
 export async function openhumanGetSandboxSettings(): Promise<CommandResponse<SandboxSettings>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<SandboxSettings>>({
     method: CORE_RPC_METHODS.configGetSandboxSettings,
   });
@@ -587,9 +542,6 @@ export async function openhumanGetSandboxSettings(): Promise<CommandResponse<San
 export async function openhumanUpdateSandboxSettings(
   update: SandboxSettingsUpdate
 ): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: CORE_RPC_METHODS.configUpdateSandboxSettings,
     params: update,
@@ -623,9 +575,6 @@ export interface MemorySyncSettingsUpdate {
 export async function openhumanGetMemorySyncSettings(): Promise<
   CommandResponse<MemorySyncSettings>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<MemorySyncSettings>>({
     method: CORE_RPC_METHODS.configGetMemorySyncSettings,
   });
@@ -634,9 +583,6 @@ export async function openhumanGetMemorySyncSettings(): Promise<
 export async function openhumanUpdateMemorySyncSettings(
   update: MemorySyncSettingsUpdate
 ): Promise<CommandResponse<MemorySyncSettings>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<MemorySyncSettings>>({
     method: CORE_RPC_METHODS.configUpdateMemorySyncSettings,
     params: update,
@@ -665,9 +611,6 @@ export interface AgentSettingsUpdate {
 }
 
 export async function openhumanGetAgentSettings(): Promise<CommandResponse<AgentSettings>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AgentSettings>>({
     method: CORE_RPC_METHODS.configGetAgentSettings,
   });
@@ -676,9 +619,6 @@ export async function openhumanGetAgentSettings(): Promise<CommandResponse<Agent
 export async function openhumanUpdateAgentSettings(
   update: AgentSettingsUpdate
 ): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: CORE_RPC_METHODS.configUpdateAgentSettings,
     params: update,
@@ -688,9 +628,7 @@ export async function openhumanUpdateAgentSettings(
 export async function openhumanUpdateLocalAiSettings(
   update: LocalAiSettingsUpdate
 ): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
+  // Works over HTTP via `callCoreRpc` in both desktop (Tauri) and webapp builds.
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: 'openhuman.inference_update_local_settings',
     params: update,
@@ -700,9 +638,6 @@ export async function openhumanUpdateLocalAiSettings(
 export async function openhumanUpdateAnalyticsSettings(update: {
   enabled?: boolean;
 }): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: CORE_RPC_METHODS.configUpdateAnalyticsSettings,
     params: update,
@@ -712,9 +647,6 @@ export async function openhumanUpdateAnalyticsSettings(update: {
 export async function openhumanGetAnalyticsSettings(): Promise<
   CommandResponse<{ enabled: boolean }>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<{ enabled: boolean }>>({
     method: CORE_RPC_METHODS.configGetAnalyticsSettings,
   });
@@ -723,9 +655,6 @@ export async function openhumanGetAnalyticsSettings(): Promise<
 export async function openhumanUpdateMeetSettings(update: {
   auto_orchestrator_handoff?: boolean;
 }): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: 'openhuman.config_update_meet_settings',
     params: update,
@@ -735,9 +664,6 @@ export async function openhumanUpdateMeetSettings(update: {
 export async function openhumanGetMeetSettings(): Promise<
   CommandResponse<{ auto_orchestrator_handoff: boolean }>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<{ auto_orchestrator_handoff: boolean }>>({
     method: 'openhuman.config_get_meet_settings',
   });
@@ -795,18 +721,12 @@ export interface DashboardSettings {
 }
 
 export async function openhumanGetDashboardSettings(): Promise<CommandResponse<DashboardSettings>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<DashboardSettings>>({
     method: CORE_RPC_METHODS.configGetDashboardSettings,
   });
 }
 
 export async function openhumanGetSearchSettings(): Promise<CommandResponse<SearchSettings>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<SearchSettings>>({
     method: CORE_RPC_METHODS.configGetSearchSettings,
   });
@@ -815,9 +735,6 @@ export async function openhumanGetSearchSettings(): Promise<CommandResponse<Sear
 export async function openhumanUpdateSearchSettings(
   update: SearchSettingsUpdate
 ): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
     method: CORE_RPC_METHODS.configUpdateSearchSettings,
     params: update,
@@ -837,9 +754,6 @@ export interface ComposioTriggerSettings {
 export async function openhumanUpdateComposioTriggerSettings(
   update: ComposioTriggerSettingsUpdate
 ): Promise<CommandResponse<ConfigSnapshot>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   try {
     return await callCoreRpc<CommandResponse<ConfigSnapshot>>({
       method: 'openhuman.config_update_composio_trigger_settings',
@@ -860,9 +774,6 @@ export async function openhumanUpdateComposioTriggerSettings(
 export async function openhumanGetComposioTriggerSettings(): Promise<
   CommandResponse<ComposioTriggerSettings>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   try {
     return await callCoreRpc<CommandResponse<ComposioTriggerSettings>>({
       method: 'openhuman.config_get_composio_trigger_settings',
@@ -880,9 +791,6 @@ export async function openhumanGetComposioTriggerSettings(): Promise<
 }
 
 export async function openhumanGetRuntimeFlags(): Promise<CommandResponse<RuntimeFlags>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<RuntimeFlags>>({
     method: CORE_RPC_METHODS.configGetRuntimeFlags,
   });
@@ -891,9 +799,6 @@ export async function openhumanGetRuntimeFlags(): Promise<CommandResponse<Runtim
 export async function openhumanSetBrowserAllowAll(
   enabled: boolean
 ): Promise<CommandResponse<RuntimeFlags>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<RuntimeFlags>>({
     method: CORE_RPC_METHODS.configSetBrowserAllowAll,
     params: { enabled },

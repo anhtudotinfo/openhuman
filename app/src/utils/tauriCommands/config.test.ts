@@ -31,12 +31,17 @@ describe('tauriCommands/config', () => {
   });
 
   describe('openhumanUpdateLocalAiSettings', () => {
-    test('throws when not running in Tauri', async () => {
+    test('forwards to core RPC over HTTP even when not running in Tauri (webapp build)', async () => {
       mockIsTauri.mockReturnValue(false);
-      await expect(openhumanUpdateLocalAiSettings({ runtime_enabled: true })).rejects.toThrow(
-        'Not running in Tauri'
-      );
-      expect(mockCallCoreRpc).not.toHaveBeenCalled();
+      mockCallCoreRpc.mockResolvedValue({
+        result: { config: {}, workspace_dir: '/tmp', config_path: '/tmp/cfg.toml' },
+        logs: [],
+      });
+      await openhumanUpdateLocalAiSettings({ runtime_enabled: true });
+      expect(mockCallCoreRpc).toHaveBeenCalledWith({
+        method: 'openhuman.inference_update_local_settings',
+        params: { runtime_enabled: true },
+      });
     });
 
     test('forwards the patch to openhuman.inference_update_local_settings', async () => {
@@ -63,12 +68,17 @@ describe('tauriCommands/config', () => {
   });
 
   describe('openhumanUpdateMeetSettings (#1299)', () => {
-    test('throws when not running in Tauri', async () => {
+    test('forwards to core RPC over HTTP even when not running in Tauri (webapp build)', async () => {
       mockIsTauri.mockReturnValue(false);
-      await expect(
-        openhumanUpdateMeetSettings({ auto_orchestrator_handoff: true })
-      ).rejects.toThrow('Not running in Tauri');
-      expect(mockCallCoreRpc).not.toHaveBeenCalled();
+      mockCallCoreRpc.mockResolvedValue({
+        result: { config: {}, workspace_dir: '/tmp', config_path: '/tmp/cfg.toml' },
+        logs: [],
+      });
+      await openhumanUpdateMeetSettings({ auto_orchestrator_handoff: true });
+      expect(mockCallCoreRpc).toHaveBeenCalledWith({
+        method: 'openhuman.config_update_meet_settings',
+        params: { auto_orchestrator_handoff: true },
+      });
     });
 
     test('forwards the patch to openhuman.config_update_meet_settings', async () => {
@@ -85,10 +95,14 @@ describe('tauriCommands/config', () => {
   });
 
   describe('openhumanGetMeetSettings (#1299)', () => {
-    test('throws when not running in Tauri', async () => {
+    test('forwards to core RPC over HTTP even when not running in Tauri (webapp build)', async () => {
       mockIsTauri.mockReturnValue(false);
-      await expect(openhumanGetMeetSettings()).rejects.toThrow('Not running in Tauri');
-      expect(mockCallCoreRpc).not.toHaveBeenCalled();
+      mockCallCoreRpc.mockResolvedValue({ result: { auto_orchestrator_handoff: true }, logs: [] });
+      const out = await openhumanGetMeetSettings();
+      expect(mockCallCoreRpc).toHaveBeenCalledWith({
+        method: 'openhuman.config_get_meet_settings',
+      });
+      expect(out.result.auto_orchestrator_handoff).toBe(true);
     });
 
     test('reads via openhuman.config_get_meet_settings', async () => {
@@ -102,12 +116,17 @@ describe('tauriCommands/config', () => {
   });
 
   describe('openhumanUpdateAutonomySettings', () => {
-    test('throws when not running in Tauri', async () => {
+    test('forwards to core RPC over HTTP even when not running in Tauri (webapp build)', async () => {
       mockIsTauri.mockReturnValue(false);
-      await expect(openhumanUpdateAutonomySettings({ max_actions_per_hour: 100 })).rejects.toThrow(
-        'Not running in Tauri'
-      );
-      expect(mockCallCoreRpc).not.toHaveBeenCalled();
+      mockCallCoreRpc.mockResolvedValue({
+        result: { config: {}, workspace_dir: '/tmp', config_path: '/tmp/cfg.toml' },
+        logs: [],
+      });
+      await openhumanUpdateAutonomySettings({ max_actions_per_hour: 100 });
+      expect(mockCallCoreRpc).toHaveBeenCalledWith({
+        method: 'openhuman.config_update_autonomy_settings',
+        params: { max_actions_per_hour: 100 },
+      });
     });
 
     test('forwards the patch to openhuman.config_update_autonomy_settings', async () => {
@@ -124,10 +143,14 @@ describe('tauriCommands/config', () => {
   });
 
   describe('openhumanGetAutonomySettings', () => {
-    test('throws when not running in Tauri', async () => {
+    test('forwards to core RPC over HTTP even when not running in Tauri (webapp build)', async () => {
       mockIsTauri.mockReturnValue(false);
-      await expect(openhumanGetAutonomySettings()).rejects.toThrow('Not running in Tauri');
-      expect(mockCallCoreRpc).not.toHaveBeenCalled();
+      mockCallCoreRpc.mockResolvedValue({ result: { max_actions_per_hour: 250 }, logs: [] });
+      const out = await openhumanGetAutonomySettings();
+      expect(mockCallCoreRpc).toHaveBeenCalledWith({
+        method: 'openhuman.config_get_autonomy_settings',
+      });
+      expect(out.result.max_actions_per_hour).toBe(250);
     });
 
     test('reads via openhuman.config_get_autonomy_settings', async () => {
@@ -148,12 +171,17 @@ describe('tauriCommands/config', () => {
       openhumanUpdateComposioTriggerSettings = actual.openhumanUpdateComposioTriggerSettings;
     });
 
-    test('throws when not running in Tauri', async () => {
+    test('forwards to core RPC over HTTP even when not running in Tauri (webapp build)', async () => {
       mockIsTauri.mockReturnValue(false);
-      await expect(
-        openhumanUpdateComposioTriggerSettings({ triage_disabled: true })
-      ).rejects.toThrow('Not running in Tauri');
-      expect(mockCallCoreRpc).not.toHaveBeenCalled();
+      mockCallCoreRpc.mockResolvedValue({
+        result: { config: {}, workspace_dir: '/tmp', config_path: '/tmp/cfg.toml' },
+        logs: [],
+      });
+      await openhumanUpdateComposioTriggerSettings({ triage_disabled: true });
+      expect(mockCallCoreRpc).toHaveBeenCalledWith({
+        method: 'openhuman.config_update_composio_trigger_settings',
+        params: { triage_disabled: true },
+      });
     });
 
     test('forwards the patch to openhuman.config_update_composio_trigger_settings', async () => {
@@ -193,10 +221,18 @@ describe('tauriCommands/config', () => {
       openhumanGetComposioTriggerSettings = actual.openhumanGetComposioTriggerSettings;
     });
 
-    test('throws when not running in Tauri', async () => {
+    test('forwards to core RPC over HTTP even when not running in Tauri (webapp build)', async () => {
       mockIsTauri.mockReturnValue(false);
-      await expect(openhumanGetComposioTriggerSettings()).rejects.toThrow('Not running in Tauri');
-      expect(mockCallCoreRpc).not.toHaveBeenCalled();
+      mockCallCoreRpc.mockResolvedValue({
+        result: { triage_disabled: false, triage_disabled_toolkits: ['slack'] },
+        logs: [],
+      });
+      const out = await openhumanGetComposioTriggerSettings();
+      expect(mockCallCoreRpc).toHaveBeenCalledWith({
+        method: 'openhuman.config_get_composio_trigger_settings',
+      });
+      expect(out.result.triage_disabled).toBe(false);
+      expect(out.result.triage_disabled_toolkits).toEqual(['slack']);
     });
 
     test('reads via openhuman.config_get_composio_trigger_settings', async () => {

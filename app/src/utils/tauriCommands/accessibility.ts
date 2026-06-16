@@ -2,7 +2,7 @@
  * Accessibility and Screen Intelligence commands.
  */
 import { callCoreRpc } from '../../services/coreRpcClient';
-import { CommandResponse, isTauri } from './common';
+import { CommandResponse } from './common';
 
 export type AccessibilityPermissionState = 'granted' | 'denied' | 'unknown' | 'unsupported';
 export type AccessibilityPermissionKind =
@@ -182,9 +182,6 @@ export interface CaptureTestResult {
 export async function openhumanAccessibilityStatus(): Promise<
   CommandResponse<AccessibilityStatus>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AccessibilityStatus>>({
     method: 'openhuman.accessibility_status',
     serviceManaged: true,
@@ -194,9 +191,6 @@ export async function openhumanAccessibilityStatus(): Promise<
 export async function openhumanAccessibilityRequestPermissions(): Promise<
   CommandResponse<AccessibilityPermissionStatus>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AccessibilityPermissionStatus>>({
     method: 'openhuman.accessibility_request_permissions',
     serviceManaged: true,
@@ -206,9 +200,6 @@ export async function openhumanAccessibilityRequestPermissions(): Promise<
 export async function openhumanAccessibilityRequestPermission(
   permission: AccessibilityPermissionKind
 ): Promise<CommandResponse<AccessibilityPermissionStatus>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AccessibilityPermissionStatus>>({
     method: 'openhuman.accessibility_request_permission',
     params: { permission },
@@ -219,9 +210,6 @@ export async function openhumanAccessibilityRequestPermission(
 export async function openhumanAccessibilityStartSession(
   params: AccessibilityStartSessionParams
 ): Promise<CommandResponse<AccessibilitySessionStatus>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AccessibilitySessionStatus>>({
     method: 'openhuman.accessibility_start_session',
     params,
@@ -232,9 +220,6 @@ export async function openhumanAccessibilityStartSession(
 export async function openhumanAccessibilityStopSession(
   params?: AccessibilityStopSessionParams
 ): Promise<CommandResponse<AccessibilitySessionStatus>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AccessibilitySessionStatus>>({
     method: 'openhuman.accessibility_stop_session',
     params: params ?? {},
@@ -245,9 +230,6 @@ export async function openhumanAccessibilityStopSession(
 export async function openhumanAccessibilityCaptureNow(): Promise<
   CommandResponse<AccessibilityCaptureNowResult>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AccessibilityCaptureNowResult>>({
     method: 'openhuman.accessibility_capture_now',
     serviceManaged: true,
@@ -257,9 +239,6 @@ export async function openhumanAccessibilityCaptureNow(): Promise<
 export async function openhumanAccessibilityInputAction(
   params: AccessibilityInputActionParams
 ): Promise<CommandResponse<AccessibilityInputActionResult>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AccessibilityInputActionResult>>({
     method: 'openhuman.accessibility_input_action',
     params,
@@ -270,9 +249,6 @@ export async function openhumanAccessibilityInputAction(
 export async function openhumanAccessibilityAutocompleteSuggest(
   params?: AccessibilityAutocompleteSuggestParams
 ): Promise<CommandResponse<AccessibilityAutocompleteSuggestResult>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AccessibilityAutocompleteSuggestResult>>({
     method: 'openhuman.accessibility_autocomplete_suggest',
     params: params ?? {},
@@ -283,9 +259,6 @@ export async function openhumanAccessibilityAutocompleteSuggest(
 export async function openhumanAccessibilityAutocompleteCommit(
   params: AccessibilityAutocompleteCommitParams
 ): Promise<CommandResponse<AccessibilityAutocompleteCommitResult>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AccessibilityAutocompleteCommitResult>>({
     method: 'openhuman.accessibility_autocomplete_commit',
     params,
@@ -296,9 +269,6 @@ export async function openhumanAccessibilityAutocompleteCommit(
 export async function openhumanAccessibilityVisionRecent(
   limit?: number
 ): Promise<CommandResponse<AccessibilityVisionRecentResult>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AccessibilityVisionRecentResult>>({
     method: 'openhuman.accessibility_vision_recent',
     params: { limit },
@@ -309,9 +279,6 @@ export async function openhumanAccessibilityVisionRecent(
 export async function openhumanAccessibilityVisionFlush(): Promise<
   CommandResponse<AccessibilityVisionFlushResult>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AccessibilityVisionFlushResult>>({
     method: 'openhuman.accessibility_vision_flush',
     serviceManaged: true,
@@ -321,9 +288,6 @@ export async function openhumanAccessibilityVisionFlush(): Promise<
 export async function openhumanScreenIntelligenceCaptureTest(): Promise<
   CommandResponse<CaptureTestResult>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<CaptureTestResult>>({
     method: 'openhuman.screen_intelligence_capture_test',
     serviceManaged: true,

@@ -1,0 +1,16 @@
+# Local self-host override for docker-compose.yml.
+#
+# The base compose hardens the container with `cap_drop: ALL`, which strips
+# CAP_CHOWN. The entrypoint (scripts/docker-entrypoint-core.sh) chowns the
+# named workspace volume from root -> openhuman(10001) before dropping
+# privileges with gosu, and that chown needs CAP_CHOWN; gosu's setuid/setgid
+# drop needs CAP_SETUID/CAP_SETGID. Without them the entrypoint exits 1 and the
+# container restart-loops. Add back only the minimal caps those two steps need.
+services:
+  openhuman-core:
+    cap_add:
+      - CHOWN        # entrypoint chown of the workspace volume
+      - DAC_OVERRIDE # write into freshly-created volume dirs
+      - FOWNER       # chown/permission ops on dirs not owned by current uid
+      - SETUID       # gosu drops to uid 10001
+      - SETGID       # gosu drops to gid 10001

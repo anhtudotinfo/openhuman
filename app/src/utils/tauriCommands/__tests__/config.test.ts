@@ -21,10 +21,24 @@ describe('openhumanGetClientConfig', () => {
     vi.resetAllMocks();
   });
 
-  it('throws when not running inside the Tauri shell', async () => {
+  it('still dispatches via callCoreRpc when not running inside the Tauri shell', async () => {
     const { isTauri } = await import('../common');
     vi.mocked(isTauri).mockReturnValueOnce(false);
-    await expect(openhumanGetClientConfig()).rejects.toThrow(/Not running in Tauri/i);
+    const expected = {
+      result: {
+        api_url: 'https://api.openai.com/v1/chat/completions',
+        default_model: 'gpt-4o',
+        app_version: '0.0.0-test',
+        api_key_set: true,
+      },
+      messages: [],
+    };
+    vi.mocked(callCoreRpc).mockResolvedValueOnce(expected);
+
+    const got = await openhumanGetClientConfig();
+
+    expect(callCoreRpc).toHaveBeenCalledWith({ method: 'openhuman.inference_get_client_config' });
+    expect(got).toEqual(expected);
   });
 
   it('dispatches openhuman.inference_get_client_config and returns the response', async () => {
@@ -84,12 +98,38 @@ describe('Claude Code wrappers', () => {
   });
 
   it.each([
-    ['openhumanClaudeCodeAuthStatus', () => openhumanClaudeCodeAuthStatus()],
-    ['openhumanClaudeCodeSettings', () => openhumanClaudeCodeSettings()],
-    ['openhumanClaudeCodeSetFullAccess', () => openhumanClaudeCodeSetFullAccess(true)],
-  ])('%s throws outside the Tauri shell', async (_name, call) => {
-    const { isTauri } = await import('../common');
-    vi.mocked(isTauri).mockReturnValueOnce(false);
-    await expect(call()).rejects.toThrow(/Not running in Tauri/i);
-  });
+    [
+      'openhumanClaudeCodeAuthStatus',
+      () => openhumanClaudeCodeAuthStatus(),
+      { source: 'subscription', account_email: 'a@b.co', last_checked: 1 },
+      { method: 'openhuman.inference_claude_code_auth_status' },
+    ],
+    [
+      'openhumanClaudeCodeSettings',
+      () => openhumanClaudeCodeSettings(),
+      { full_access: true },
+      { method: 'openhuman.inference_claude_code_settings' },
+    ],
+    [
+      'openhumanClaudeCodeSetFullAccess',
+      () => openhumanClaudeCodeSetFullAccess(false),
+      { full_access: false },
+      {
+        method: 'openhuman.inference_claude_code_set_full_access',
+        params: { enabled: false },
+      },
+    ],
+  ])(
+    '%s still dispatches via callCoreRpc outside the Tauri shell',
+    async (_name, call, expected, expectedArgs) => {
+      const { isTauri } = await import('../common');
+      vi.mocked(isTauri).mockReturnValueOnce(false);
+      vi.mocked(callCoreRpc).mockResolvedValueOnce(expected as never);
+
+      const got = await call();
+
+      expect(callCoreRpc).toHaveBeenCalledWith(expectedArgs);
+      expect(got).toEqual(expected);
+    }
+  );
 });

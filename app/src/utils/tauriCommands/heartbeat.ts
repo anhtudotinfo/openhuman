@@ -2,7 +2,7 @@
  * Heartbeat loop commands.
  */
 import { callCoreRpc } from '../../services/coreRpcClient';
-import { type CommandResponse, isTauri } from './common';
+import { type CommandResponse } from './common';
 
 export type SubconsciousMode = 'off' | 'simple' | 'aggressive';
 
@@ -32,9 +32,7 @@ export interface HeartbeatPlannerSummary {
 export async function openhumanHeartbeatSettingsGet(): Promise<
   CommandResponse<{ settings: HeartbeatSettings }>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
+  // Works over HTTP via `callCoreRpc` in both desktop (Tauri) and webapp builds.
   return await callCoreRpc<CommandResponse<{ settings: HeartbeatSettings }>>({
     method: 'openhuman.heartbeat_settings_get',
   });
@@ -43,9 +41,7 @@ export async function openhumanHeartbeatSettingsGet(): Promise<
 export async function openhumanHeartbeatSettingsSet(
   patch: HeartbeatSettingsPatch
 ): Promise<CommandResponse<{ settings: HeartbeatSettings }>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
+  // Works over HTTP via `callCoreRpc` in both desktop (Tauri) and webapp builds.
   return await callCoreRpc<CommandResponse<{ settings: HeartbeatSettings }>>({
     method: 'openhuman.heartbeat_settings_set',
     params: patch,
@@ -55,9 +51,7 @@ export async function openhumanHeartbeatSettingsSet(
 export async function openhumanHeartbeatTickNow(): Promise<
   CommandResponse<{ summary: HeartbeatPlannerSummary }>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
+  // Works over HTTP via `callCoreRpc` in both desktop (Tauri) and webapp builds.
   return await callCoreRpc<CommandResponse<{ summary: HeartbeatPlannerSummary }>>({
     method: 'openhuman.heartbeat_tick_now',
   });

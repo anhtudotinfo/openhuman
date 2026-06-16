@@ -2,7 +2,7 @@
  * Autocomplete commands.
  */
 import { callCoreRpc } from '../../services/coreRpcClient';
-import { CommandResponse, isTauri } from './common';
+import { CommandResponse } from './common';
 
 export interface AutocompleteSuggestion {
   value: string;
@@ -113,9 +113,6 @@ export interface AutocompleteClearHistoryResult {
 }
 
 export async function openhumanAutocompleteStatus(): Promise<CommandResponse<AutocompleteStatus>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AutocompleteStatus>>({
     method: 'openhuman.autocomplete_status',
   });
@@ -124,9 +121,6 @@ export async function openhumanAutocompleteStatus(): Promise<CommandResponse<Aut
 export async function openhumanAutocompleteStart(
   params?: AutocompleteStartParams
 ): Promise<CommandResponse<AutocompleteStartResult>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AutocompleteStartResult>>({
     method: 'openhuman.autocomplete_start',
     params: params ?? {},
@@ -136,9 +130,6 @@ export async function openhumanAutocompleteStart(
 export async function openhumanAutocompleteStop(
   params?: AutocompleteStopParams
 ): Promise<CommandResponse<AutocompleteStopResult>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AutocompleteStopResult>>({
     method: 'openhuman.autocomplete_stop',
     params: params ?? {},
@@ -148,9 +139,6 @@ export async function openhumanAutocompleteStop(
 export async function openhumanAutocompleteCurrent(
   params?: AutocompleteCurrentParams
 ): Promise<CommandResponse<AutocompleteCurrentResult>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AutocompleteCurrentResult>>({
     method: 'openhuman.autocomplete_current',
     params: params ?? {},
@@ -160,9 +148,6 @@ export async function openhumanAutocompleteCurrent(
 export async function openhumanAutocompleteDebugFocus(): Promise<
   CommandResponse<AutocompleteDebugFocusResult>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AutocompleteDebugFocusResult>>({
     method: 'openhuman.autocomplete_debug_focus',
   });
@@ -171,9 +156,6 @@ export async function openhumanAutocompleteDebugFocus(): Promise<
 export async function openhumanAutocompleteAccept(
   params?: AutocompleteAcceptParams
 ): Promise<CommandResponse<AutocompleteAcceptResult>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AutocompleteAcceptResult>>({
     method: 'openhuman.autocomplete_accept',
     params: params ?? {},
@@ -183,9 +165,6 @@ export async function openhumanAutocompleteAccept(
 export async function openhumanAutocompleteSetStyle(
   params: AutocompleteSetStyleParams
 ): Promise<CommandResponse<AutocompleteSetStyleResult>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AutocompleteSetStyleResult>>({
     method: 'openhuman.autocomplete_set_style',
     params,
@@ -195,9 +174,6 @@ export async function openhumanAutocompleteSetStyle(
 export async function openhumanAutocompleteHistory(params?: {
   limit?: number;
 }): Promise<CommandResponse<AutocompleteHistoryResult>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AutocompleteHistoryResult>>({
     method: 'openhuman.autocomplete_history',
     params: params ?? {},
@@ -207,9 +183,6 @@ export async function openhumanAutocompleteHistory(params?: {
 export async function openhumanAutocompleteClearHistory(): Promise<
   CommandResponse<AutocompleteClearHistoryResult>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<AutocompleteClearHistoryResult>>({
     method: 'openhuman.autocomplete_clear_history',
   });

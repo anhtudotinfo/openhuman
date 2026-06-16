@@ -2,7 +2,7 @@
  * Webhook debug commands.
  */
 import { callCoreRpc } from '../../services/coreRpcClient';
-import { CommandResponse, isTauri } from './common';
+import { CommandResponse } from './common';
 
 export interface WebhookDebugRegistration {
   tunnel_uuid: string;
@@ -43,9 +43,6 @@ export interface WebhookDebugEvent {
 export async function openhumanWebhooksListRegistrations(): Promise<
   CommandResponse<{ result: { registrations: WebhookDebugRegistration[] } }>
 > {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<
     CommandResponse<{ result: { registrations: WebhookDebugRegistration[] } }>
   >({ method: 'openhuman.webhooks_list_registrations' });
@@ -54,9 +51,6 @@ export async function openhumanWebhooksListRegistrations(): Promise<
 export async function openhumanWebhooksListLogs(
   limit = 100
 ): Promise<CommandResponse<{ result: { logs: WebhookDebugLogEntry[] } }>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<{ result: { logs: WebhookDebugLogEntry[] } }>>({
     method: 'openhuman.webhooks_list_logs',
     params: { limit },
@@ -64,9 +58,6 @@ export async function openhumanWebhooksListLogs(
 }
 
 export async function openhumanWebhooksClearLogs(): Promise<CommandResponse<{ cleared: number }>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<CommandResponse<{ cleared: number }>>({
     method: 'openhuman.webhooks_clear_logs',
   });
@@ -77,9 +68,6 @@ export async function openhumanWebhooksRegisterEcho(
   tunnelName?: string,
   backendTunnelId?: string
 ): Promise<CommandResponse<{ result: { registrations: WebhookDebugRegistration[] } }>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<
     CommandResponse<{ result: { registrations: WebhookDebugRegistration[] } }>
   >({
@@ -95,9 +83,6 @@ export async function openhumanWebhooksRegisterEcho(
 export async function openhumanWebhooksUnregisterEcho(
   tunnelUuid: string
 ): Promise<CommandResponse<{ result: { registrations: WebhookDebugRegistration[] } }>> {
-  if (!isTauri()) {
-    throw new Error('Not running in Tauri');
-  }
   return await callCoreRpc<
     CommandResponse<{ result: { registrations: WebhookDebugRegistration[] } }>
   >({ method: 'openhuman.webhooks_unregister_echo', params: { tunnel_uuid: tunnelUuid } });
