@@ -285,7 +285,8 @@ export async function resetOpenHumanDataAndRestartCore(): Promise<void> {
 
 /** Read onboarding_completed from core config. */
 export async function getOnboardingCompleted(): Promise<boolean> {
-  if (!isTauri()) return false;
+  // callCoreRpc talks to the core over HTTP, so this works in both desktop and
+  // webapp builds — the onboarding-completed flag lives in core config.
   const res = await callCoreRpc<boolean | { result: boolean }>({
     method: 'openhuman.config_get_onboarding_completed',
   });
@@ -297,7 +298,8 @@ export async function getOnboardingCompleted(): Promise<boolean> {
 
 /** Write onboarding_completed to core config. */
 export async function setOnboardingCompleted(value: boolean): Promise<boolean> {
-  if (!isTauri()) return false;
+  // Persist over HTTP via callCoreRpc in both desktop and webapp builds so the
+  // onboarding wizard's "done" actually sticks in the browser.
   const res = await callCoreRpc<boolean | { result: boolean }>({
     method: 'openhuman.config_set_onboarding_completed',
     params: { value },
