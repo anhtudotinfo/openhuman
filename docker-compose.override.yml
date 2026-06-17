@@ -14,3 +14,10 @@ services:
       - FOWNER       # chown/permission ops on dirs not owned by current uid
       - SETUID       # gosu drops to uid 10001
       - SETGID       # gosu drops to gid 10001
+    environment:
+      # Reach the host's Ollama (for local embeddings) via the docker bridge
+      # gateway. `localhost` inside the container is the container itself, so the
+      # core must target the host gateway IP where `ollama serve` listens.
+      OPENHUMAN_OLLAMA_BASE_URL: http://172.21.0.1:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
